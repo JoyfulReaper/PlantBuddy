@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using PlantBuddy.Server.Authentication;
@@ -9,15 +8,12 @@ namespace PlantBuddy.Server.DependencyInjection;
 
 public static class AuthenticationAuthorization
 {
-    public static IServiceCollection AddAuthenticationAndAuthorization(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddAuthenticationAndAuthorization(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
-        services.AddAuthorization(opts =>
-        {
-            opts.FallbackPolicy = new AuthorizationPolicyBuilder()
-                .RequireAuthenticatedUser()
-                .Build();
-        });
-
+        services.AddAuthorization();
+        
         var jwtOptions = new JwtSettings();
         configuration.Bind(JwtSettings.SectionName, jwtOptions);
 
