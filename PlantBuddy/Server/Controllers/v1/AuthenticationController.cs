@@ -15,7 +15,7 @@ namespace PlantBuddy.Server.Controllers.v1;
 [Route("api/v{version:apiVersion}/[controller]")]
 [ApiVersion("1.0")]
 [ApiController]
-[AllowAnonymous]
+[Authorize]
 public class AuthenticationController : ApiController
 {
     private readonly ISender _mediator;
@@ -27,6 +27,7 @@ public class AuthenticationController : ApiController
         _mapper = mapper;
     }
 
+    [AllowAnonymous]
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterRequest request)
     {
@@ -38,6 +39,7 @@ public class AuthenticationController : ApiController
             errors => Problem(errors));
     }
 
+    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginRequest request)
     {
