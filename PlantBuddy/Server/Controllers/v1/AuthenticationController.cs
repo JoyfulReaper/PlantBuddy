@@ -3,6 +3,7 @@ using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using PlantBuddy.Server.Authentication.Commands;
 using PlantBuddy.Server.Authentication.Common;
@@ -45,6 +46,28 @@ public class AuthenticationController : ApiController
 
         return result.Match(
             result => Ok(_mapper.Map<AuthenticationResponse>(result)),
+            errors => Problem(errors));
+    }
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh(TokenRefreshRequest request)
+    {
+        var query = _mapper.Map<TokenRefreshQuery>(request);
+        ErrorOr<AuthenticationResult> result = await _mediator.Send(query);
+
+        return result.Match(
+            result => Ok(_mapper.Map<AuthenticationResponse>(result)),
+            errors => Problem(errors));
+    }
+
+    [HttpPost("revoke")]
+    public async Task<IActionResult> Revoke()
+    {
+        var query = new TokenRevokeQuery(User.Identity.Name);
+        var result = await _mediator.Send(query);
+
+        return result.Match(
+            result => NoContent(),
             errors => Problem(errors));
     }
 }

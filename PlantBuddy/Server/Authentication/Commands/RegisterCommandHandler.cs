@@ -1,7 +1,9 @@
 ﻿using ErrorOr;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using PlantBuddy.Server.Authentication.Common;
+using PlantBuddy.Server.Common.Services;
 using PlantBuddy.Server.Identity;
 
 namespace PlantBuddy.Server.Authentication.Commands;
@@ -11,13 +13,19 @@ public class RegisterCommandHandler :
 {
     private readonly UserManager<PlantBuddyUser> _userManager;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
+    private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly JwtSettings _jwtSettings;
 
     public RegisterCommandHandler(
         UserManager<PlantBuddyUser> userManager,
-        IJwtTokenGenerator jwtTokenGenerator)
+        IJwtTokenGenerator jwtTokenGenerator,
+        IDateTimeProvider dateTimeProvider,
+        IOptions<JwtSettings> jwtSettings)
     {
         _userManager = userManager;
         _jwtTokenGenerator = jwtTokenGenerator;
+        _dateTimeProvider = dateTimeProvider;
+        _jwtSettings = jwtSettings.Value;
     }
 
     public async Task<ErrorOr<AuthenticationResult>> Handle(RegisterCommand request, CancellationToken cancellationToken)
@@ -41,7 +49,12 @@ public class RegisterCommandHandler :
         }
 
         var token = _jwtTokenGenerator.GenerateToken(user);
+        
+        var refreshToken = _jwtTokenGenerator.GenerateRefreshToken();
+        user.RefreshToken = refreshToken;
+        user.RefreshTokenExpiryTime = _dateTimeProvider.UtcNow.AddDays(_jwtSettings.RefreshExpirationDays);
+        await _userManager.UpdateAsync(user);
 
-        return new AuthenticationResult(user, token);
+        return new AuthenticationResult(user, token, refreshToken);
     }
 }
