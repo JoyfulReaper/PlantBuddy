@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PlantBuddy.Server.Authentication.Commands;
 using PlantBuddy.Server.Authentication.Common;
+using PlantBuddy.Server.Authentication.Queries;
 using PlantBuddy.Shared.Contracts.Authentication;
 
 namespace PlantBuddy.Server.Controllers.v1;
@@ -30,6 +31,17 @@ public class AuthenticationController : ApiController
     {
         var command = _mapper.Map<RegisterCommand>(request);
         ErrorOr<AuthenticationResult> result = await _mediator.Send(command);
+
+        return result.Match(
+            result => Ok(_mapper.Map<AuthenticationResponse>(result)),
+            errors => Problem(errors));
+    }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(LoginRequest request)
+    {
+        var query = _mapper.Map<LoginQuery>(request);
+        ErrorOr<AuthenticationResult> result = await _mediator.Send(query);
 
         return result.Match(
             result => Ok(_mapper.Map<AuthenticationResponse>(result)),
