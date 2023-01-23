@@ -1,8 +1,10 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using PlantBuddy.Server.Authentication;
 using PlantBuddy.Server.Common.Behaviors;
 using PlantBuddy.Server.Common.Errors;
+using PlantBuddy.Server.Common.Services;
 using PlantBuddy.Server.DependencyInjection;
 using System.Reflection;
 
@@ -22,6 +24,11 @@ var builder = WebApplication.CreateBuilder(args);
             typeof(ValidationBehavior<,>));
 
     builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+
+    builder.Services.AddMappings();
+    
+    builder.Services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+    builder.Services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 }
 
 var app = builder.Build();
@@ -42,15 +49,15 @@ var app = builder.Build();
         app.UseHsts();
     }
 
-    app.UseHttpsRedirection();
+    app.UseExceptionHandler("/error");
 
+    app.UseHttpsRedirection();
     app.UseBlazorFrameworkFiles();
     app.UseStaticFiles();
 
     app.UseAuthentication();
-    app.UseAuthorization();
-
     app.UseRouting();
+    app.UseAuthorization();
 
     app.MapRazorPages();
     app.MapControllers();
