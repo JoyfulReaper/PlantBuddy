@@ -1,6 +1,15 @@
 ﻿@page "/"
 
-<h3>HomePage</h3>
+<h3>Home Page</h3>
+
+<AuthorizeView>
+    <Authorized>
+        <span>You're Loged in as @context.User.Identity.Name</span>
+    </Authorized>
+    <NotAuthorized>
+        <span>You're not logged in.</span>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
 
