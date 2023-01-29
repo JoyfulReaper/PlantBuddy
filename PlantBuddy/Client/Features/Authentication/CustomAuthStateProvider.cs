@@ -30,7 +30,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 
         if (!string.IsNullOrEmpty(token))
         {
-            var claims = ParseClaimsFromJwt(token);
+            var claims = ParseClaimsFromJwt(token).ToList();
             var expiration = claims.Where(c => c.Type == "exp").FirstOrDefault();
             if (expiration != null)
             {
@@ -43,9 +43,10 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
                     claims = new List<Claim>();
                 }
             }
-
+            
             //identity = new ClaimsIdentity(claims, "jwt");
-            identity = new ClaimsIdentity(claims, "jwt", ClaimTypes.Name, null); // TODO: look into how to set the role
+            // TODO: Look into how to better parse the token
+            identity = new ClaimsIdentity(claims, "jwt", "name", null); // TODO: look into how to set the role
 
 
             _http.DefaultRequestHeaders.Authorization =

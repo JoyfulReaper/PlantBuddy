@@ -54,7 +54,7 @@ public class AuthenticationController : ApiController
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh(TokenRefreshRequest request)
     {
-        var query = _mapper.Map<TokenRefreshQuery>(request);
+        var query = _mapper.Map<TokenRefreshCommand>(request);
         ErrorOr<AuthenticationResult> result = await _mediator.Send(query);
 
         return result.Match(
@@ -65,7 +65,7 @@ public class AuthenticationController : ApiController
     [HttpPost("revoke")]
     public async Task<IActionResult> Revoke()
     {
-        var query = new TokenRevokeQuery(User.Identity.Name);
+        var query = new TokenRevokeCommand(User.Identity.Name);
         var result = await _mediator.Send(query);
 
         return result.Match(

@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Identity;
 using PlantBuddy.Server.Common.Errors;
 using PlantBuddy.Server.Identity;
 
-namespace PlantBuddy.Server.Authentication.Queries;
+namespace PlantBuddy.Server.Authentication.Commands;
 
-public class TokenRevokeHandler : IRequestHandler<TokenRevokeQuery, ErrorOr<Success>>
+public class TokenRevokeHandler : IRequestHandler<TokenRevokeCommand, ErrorOr<Success>>
 {
     private readonly UserManager<PlantBuddyUser> _userManager;
 
@@ -15,9 +15,9 @@ public class TokenRevokeHandler : IRequestHandler<TokenRevokeQuery, ErrorOr<Succ
         _userManager = userManager;
     }
 
-    public async Task<ErrorOr<Success>> Handle(TokenRevokeQuery request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<Success>> Handle(TokenRevokeCommand request, CancellationToken cancellationToken)
     {
-        if(request.email is null)
+        if (request.email is null)
         {
             return Errors.Authentication.InvalidCredentials;
         }

@@ -2,8 +2,8 @@
 using MediatR;
 using PlantBuddy.Server.Authentication.Common;
 
-namespace PlantBuddy.Server.Authentication.Queries;
+namespace PlantBuddy.Server.Authentication.Commands;
 
-public record TokenRefreshQuery(
+public record TokenRefreshCommand(
     string token,
     string refreshToken) : IRequest<ErrorOr<AuthenticationResult>>;

@@ -14,7 +14,7 @@ public class AuthenticationMapping : IRegister
 
         config.NewConfig<LoginRequest, LoginQuery>();
 
-        config.NewConfig<TokenRefreshRequest, TokenRefreshQuery>();
+        config.NewConfig<TokenRefreshRequest, TokenRefreshCommand>();
 
         config.NewConfig<AuthenticationResult, AuthenticationResponse>()
             .Map(dest => dest.Id, src => src.User.Id)

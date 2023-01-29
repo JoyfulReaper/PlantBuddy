@@ -8,9 +8,9 @@ using PlantBuddy.Server.Common.Services;
 using PlantBuddy.Server.Identity;
 using System.Security.Claims;
 
-namespace PlantBuddy.Server.Authentication.Queries;
+namespace PlantBuddy.Server.Authentication.Commands;
 
-public class TokenRefreshHandler : IRequestHandler<TokenRefreshQuery, ErrorOr<AuthenticationResult>>
+public class TokenRefreshHandler : IRequestHandler<TokenRefreshCommand, ErrorOr<AuthenticationResult>>
 {
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly UserManager<PlantBuddyUser> _userManager;
@@ -29,10 +29,10 @@ public class TokenRefreshHandler : IRequestHandler<TokenRefreshQuery, ErrorOr<Au
         _jwtSettings = jwtSettings.Value;
     }
 
-    public async Task<ErrorOr<AuthenticationResult>> Handle(TokenRefreshQuery request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<AuthenticationResult>> Handle(TokenRefreshCommand request, CancellationToken cancellationToken)
     {
         var principalResult = _jwtTokenGenerator.GetPrincipalFromExpiredToke(request.token);
-        if(principalResult.IsError)
+        if (principalResult.IsError)
         {
             return principalResult.Errors;
         }
@@ -40,8 +40,8 @@ public class TokenRefreshHandler : IRequestHandler<TokenRefreshQuery, ErrorOr<Au
         var username = principalResult.Value.Identity.Name;
         var user = await _userManager.FindByNameAsync(username);
 
-        if(user is null ||
-            user.RefreshToken != request.refreshToken || 
+        if (user is null ||
+            user.RefreshToken != request.refreshToken ||
             user.RefreshTokenExpiryTime <= _dateTimeProvider.UtcNow)
         {
             return Errors.Authentication.InvalidToken;
